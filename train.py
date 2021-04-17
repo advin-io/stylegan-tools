@@ -21,6 +21,8 @@ from training import training_loop
 from metrics import metric_main
 from torch_utils import training_stats
 from torch_utils import custom_ops
+from knockknock import discord_sender
+webhook_url = "https://discord.com/api/webhooks/832817791080857650/Av-oegbL4ATJ3mfucYrZL6ERXU9LVYwTb1X2DFI5ocnHO4c2kVT_NGlb763bcuAykYKM"
 
 #----------------------------------------------------------------------------
 
