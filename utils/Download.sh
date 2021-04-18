@@ -40,6 +40,9 @@ elif  [ $FILE == "afhq-dataset" ]; then
     unzip $ZIP_FILE -d $DATASET_DIR/
     rm $ZIP_FILE
 
+elif  [ $FILE == "shape-predictor" ]; then
+    wget http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
+
 else
     echo "Available arguments are pretrained-network-celeba-hq, pretrained-network-afhq, celeba-hq-dataset, and afhq-dataset."
     exit 1
