@@ -6,3 +6,7 @@ pretrained/*
 projections/*
 aligned/*
 frames/*
+*.jpg
+*.png
+*.mp4
+*.mp3
