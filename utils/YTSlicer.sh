@@ -2,7 +2,7 @@
 
 ### Snatch YouTube video and extract into frames
 
-START_TIME="00:00"
+START_TIME=0
 LENGTH=0
 VIDEO_NAME="clip"
 
@@ -58,10 +58,14 @@ done
 # set positional arguments in their proper place
 eval set -- "$PARAMS"
 
+if [ -z $OUTPUT_DIR ]; then
+    OUTPUT_DIR="./youtube"
+fi
+
 if [ ! -d "$OUTPUT_DIR/" ]; then
     mkdir -p $OUTPUT_DIR
 else
-    rm $OUTPUT_DIR/*
+    rm -f $OUTPUT_DIR/*
 fi
 
 mv ./NA.mp4 ./$VIDEO_NAME.mp4
@@ -69,13 +73,11 @@ mv ./NA.mp4 ./$VIDEO_NAME.mp4
 if [[ -z $LENGTH ]]; then
     ffmpeg -y -hide_banner -loglevel panic \
         -i ./$VIDEO_NAME.mp4 $OUTPUT_DIR/$VIDEO_NAME%05d.png \
-        -q:a 0 -map a $VIDEO_NAME/clip.mp3 \
-        -c copy ./$VIDEO_NAME-original.mp4
+        -q:a 0 -map a $VIDEO_NAME.mp3
 else
     ffmpeg -y -hide_banner -loglevel panic \
-        -ss 00:$START_TIME.00 \
+        -ss $START_TIME \
+        -t $LENGTH \
         -i ./$VIDEO_NAME.mp4 $OUTPUT_DIR/$VIDEO_NAME%05d.png \
-        -t 00:$LENGTH.00 \
-        -q:a 0 -map a $VIDEO_NAME.mp3 \
-        -c copy ./$VIDEO_NAME-original.mp4
+        -q:a 0 -map a $VIDEO_NAME.mp3
 fi

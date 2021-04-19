@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 SEED="0"
+NET="ffhq"
 
 PARAMS=""
 POSITIONAL=()
@@ -12,13 +13,9 @@ while [[ $# -gt 0 ]]; do
             echo "Required args: --input, --output, --seed, --net"
             exit 1
             ;;  
-        --save-video)
-            SAVE="--save-video"
-            shift
-            ;;              
         # Variables
         -i|--input)
-            IMAGE="$2"
+            INPUT_DIR="$2"
             shift 2
             ;;
         -o|--output)
@@ -54,6 +51,6 @@ docker run --gpus all -it --rm --shm-size=8g \
 	-v `pwd`:/input -w /stylegan \
     -v $HOME/github/stylegan-tools:/stylegan \
 	-e DNNLIB_CACHE_DIR=/stylegan/.cache \
-	stylegan:latest python /stylegan/projector.py \
-	--outdir=/input/$OUTPUT_DIR --seed=${SEED} --target=${IMAGE} \
-    --network=/stylegan/pretrained/${NET}.pkl $SAVE
+	stylegan:latest python /stylegan/projector-dev.py \
+	--outdir=/input/$OUTPUT_DIR --seed=$SEED --target=$INPUT_DIR \
+    --network=/stylegan/pretrained/${NET}.pkl

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+mkdir -p "./pretrained"
+
 helpmenu() { 
     echo "Required inputs: --net or --data"
     echo "Networks available: celeba-hq, afhq(dog,cat,wild), ffhq, shape-predictor"
@@ -47,22 +49,27 @@ if [ ! -z $NET ]; then
             wget -N $URL -O $OUT_FILE
             ;;
         "afhqcat")
-            wget https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/afhqcat.pkl
+            wget -O ./pretrained/afhqcat.pkl https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/afhqcat.pkl
             ;;
         "afhqdog")
-            wget https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/afhqdog.pkl
+            wget -O ./pretrained/afhqcat.pkl https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/afhqdog.pkl
             ;;
         "afhqwild")
-            wget https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/afhqwild.pkl
+            wget -O ./pretrained/afhqcat.pkl https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/afhqwild.pkl
             ;;
         "metfaces")
-            wget https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/metfaces.pkl
+            wget -O ./pretrained/afhqcat.pkl https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/metfaces.pkl
             ;;
         "ffhq")
-            wget https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/ffhq.pkl
+            wget -O ./pretrained/ffhq.pkl https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/ffhq.pkl
             ;;
         "shape-predictor")
             wget http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
+            bzip2 -d shape_predictor_68_face_landmarks.dat.bz2
+            mv shape_predictor_68_face_landmarks.dat ./pretrained/shape_predictor.dat
+            ;;
+        "vgg16")
+            wget -O ./pretrained/vgg16.pt https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/metrics/vgg16.pt
             ;;
         *) # unsupported flags
             echo "Error: Unsupported network \"$NET\"" >&2

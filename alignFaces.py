@@ -77,6 +77,8 @@ parser.add_argument('--output', help='Aligned image folder', dest='output_folder
 parser.add_argument('--json', help='Landmark output file', dest='json', required=True)
 args = parser.parse_args()
 
+SAVING_JSON = False
+
 # Create output directory if needed
 if not os.path.exists(args.output_folder_path): os.mkdir(args.output_folder_path)
 
@@ -98,7 +100,7 @@ if len(glob.glob(os.path.join(args.faces_folder_path, "*.*")))==0:
     exit()
 
 for idx, f in enumerate(sorted(glob.glob(os.path.join(args.faces_folder_path, "*.*")))):
-    num = str(idx)
+    num = str(0)
     fileName = Path(f).stem # extract filename
 
     # Save metadata
@@ -115,9 +117,6 @@ for idx, f in enumerate(sorted(glob.glob(os.path.join(args.faces_folder_path, "*
     shape = predictor(img, detection) # get face landmarks
     # Create landmark list
     landmarks = [(part.x, part.y) for part in shape.parts()]
-    newJson[num]["in_the_wild"]["face_landmarks"] = landmarks # save landmarks to json
-    newJson[num]["in_the_wild"]["file_size"]= os.path.getsize(f)
-    newJson[num]["in_the_wild"]["file_path"] = str(f)
 
     # Align to landmarks in json file
     alignedImage = recreate_aligned_images(newJson,
@@ -125,18 +124,20 @@ for idx, f in enumerate(sorted(glob.glob(os.path.join(args.faces_folder_path, "*
 
     # Save aligned image
     savePath = "{}/{}{:05d}.png".format(args.output_folder_path, fileName, idx)
-    print(savePath)
     alignedImage.save(savePath) # save image to file
-    newJson[num]["image"]["file_path"] = savePath
-    newJson[num]["image"]["file_size"]= os.path.getsize(savePath)
-    newJson[num]["in_the_wild"]["face_rect"]=[detection.left(),
-                                            detection.top(),
-                                            detection.right(),
-                                            detection.bottom()]
+    if SAVING_JSON:
+        newJson[num]["in_the_wild"]["face_landmarks"] = landmarks # save landmarks to json
+        newJson[num]["in_the_wild"]["file_size"]= os.path.getsize(f)
+        newJson[num]["in_the_wild"]["file_path"] = str(f)        newJson[num]["image"]["file_path"] = savePath
+        newJson[num]["image"]["file_size"]= os.path.getsize(savePath)
+        newJson[num]["in_the_wild"]["face_rect"]=[detection.left(),
+                                                detection.top(),
+                                                detection.right(),
+                                                detection.bottom()]
 
-    # CHANGE TO USE IMAGE VARIABLE
-    newJson[num]["image"]["face_landmarks"] = get_landmarks(dlib.load_rgb_image(savePath))
+        # CHANGE TO USE IMAGE VARIABLE
+        newJson[num]["image"]["face_landmarks"] = get_landmarks(dlib.load_rgb_image(savePath))
 
-    with open("{}/{}{:05d}.json".format(args.output_folder_path,fileName,idx), 'w') as f:
-        json.dump(newJson, f)
-        f.close()
+        with open("{}/{}{:05d}.json".format(args.output_folder_path,fileName,idx), 'w') as f:
+            json.dump(newJson, f)
+            f.close()
