@@ -1,50 +1,96 @@
 #!/usr/bin/env bash
 
-FILE=$1
-DATASET_DIR="$HOME/Datasets"
-mkdir -p $DATASET_DIR
-
-if [ $FILE == "pretrained-network-celeba-hq" ]; then
-    URL=https://www.dropbox.com/s/96fmei6c93o8b8t/100000_nets_ema.ckpt?dl=0
-    mkdir -p ./expr/checkpoints/celeba_hq
-    OUT_FILE=./expr/checkpoints/celeba_hq/100000_nets_ema.ckpt
-    wget -N $URL -O $OUT_FILE
-
-elif  [ $FILE == "pretrained-network-afhq" ]; then
-    URL=https://www.dropbox.com/s/etwm810v25h42sn/100000_nets_ema.ckpt?dl=0
-    mkdir -p ./expr/checkpoints/afhq
-    OUT_FILE=./expr/checkpoints/afhq/100000_nets_ema.ckpt
-    wget -N $URL -O $OUT_FILE
-    
-elif  [ $FILE == "wing" ]; then
-    URL=https://www.dropbox.com/s/tjxpypwpt38926e/wing.ckpt?dl=0
-    mkdir -p ./expr/checkpoints/
-    OUT_FILE=./expr/checkpoints/wing.ckpt
-    wget -N $URL -O $OUT_FILE
-    URL=https://www.dropbox.com/s/91fth49gyb7xksk/celeba_lm_mean.npz?dl=0
-    OUT_FILE=./expr/checkpoints/celeba_lm_mean.npz
-    wget -N $URL -O $OUT_FILE
-
-elif  [ $FILE == "celeba-hq-dataset" ]; then
-    URL=https://www.dropbox.com/s/f7pvjij2xlpff59/celeba_hq.zip?dl=0
-    ZIP_FILE=./data/celeba_hq.zip
-    mkdir -p ./data
-    wget -N $URL -O $ZIP_FILE
-    unzip $ZIP_FILE -d ./data
-    rm $ZIP_FILE
-
-elif  [ $FILE == "afhq-dataset" ]; then
-    URL=https://www.dropbox.com/s/t9l9o3vsx2jai3z/afhq.zip?dl=0
-    ZIP_FILE=$DATASET_DIR/afhq.zip
-    wget -N $URL -O $ZIP_FILE
-    unzip $ZIP_FILE -d $DATASET_DIR/
-    rm $ZIP_FILE
-
-elif  [ $FILE == "shape-predictor" ]; then
-    wget http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
-
-else
-    echo "Available arguments are pretrained-network-celeba-hq, pretrained-network-afhq, celeba-hq-dataset, and afhq-dataset."
+helpmenu() { 
+    echo "Required inputs: --net or --data"
+    echo "Networks available: celeba-hq, afhq(dog,cat,wild), ffhq, shape-predictor"
+    echo "Datasets available: celeba-hq, afhq"
     exit 1
+}
 
+PARAMS=""
+POSITIONAL=()
+while [[ $# -gt 0 ]]; do
+    key="$1"
+    case $key in
+        # Flags
+        -h|--help)
+            helpmenu
+            ;;
+        # Variables
+        -d|--data)
+            DATA="$2"
+            shift 2
+            ;;
+        -n|--net)
+            NET="$2"
+            shift 2
+            ;;
+        -*|--*=) # unsupported flags
+            echo "Error: Unsupported flag $2" >&2
+            shift
+            ;;
+        *) # preserve positional arguments
+            PARAMS="$PARAMS $1"
+            ;;
+    esac
+done
+
+# set positional arguments in their proper place
+eval set -- "$PARAMS"
+
+if [ ! -z $NET ]; then
+    case $NET in
+        # Models
+        "celeba-hq")
+            URL=https://www.dropbox.com/s/96fmei6c93o8b8t/100000_nets_ema.ckpt?dl=0
+            OUT_FILE=./celeba-hq-100000.ckpt
+            wget -N $URL -O $OUT_FILE
+            ;;
+        "afhqcat")
+            wget https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/afhqcat.pkl
+            ;;
+        "afhqdog")
+            wget https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/afhqdog.pkl
+            ;;
+        "afhqwild")
+            wget https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/afhqwild.pkl
+            ;;
+        "metfaces")
+            wget https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/metfaces.pkl
+            ;;
+        "ffhq")
+            wget https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/ffhq.pkl
+            ;;
+        "shape-predictor")
+            wget http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
+            ;;
+        *) # unsupported flags
+            echo "Error: Unsupported network \"$NET\"" >&2
+            echo "Networks available: celeba-hq, afhq(dog,cat,wild), ffhq, shape-predictor"
+            exit 1
+            ;;
+    esac
+else
+    case $DATA in
+        # Models
+        "celeba-hq")
+            URL=https://www.dropbox.com/s/f7pvjij2xlpff59/celeba_hq.zip?dl=0
+            ZIP_FILE=celeba-hq.zip
+            wget -N $URL -O $ZIP_FILE
+            unzip $ZIP_FILE -d ./celeba-hq
+            rm $ZIP_FILE
+            ;;
+        "afhq")
+            URL=https://www.dropbox.com/s/t9l9o3vsx2jai3z/afhq.zip?dl=0
+            ZIP_FILE=./afhq.zip
+            wget -N $URL -O $ZIP_FILE
+            unzip $ZIP_FILE -d ./afhq
+            rm $ZIP_FILE
+            ;;
+        *) # unsupported flags
+            echo "Error: Unsupported dataset \"$DATA\"" >&2
+            echo "Datasets available: celeba-hq, afhq"
+            exit 1
+            ;;
+    esac
 fi

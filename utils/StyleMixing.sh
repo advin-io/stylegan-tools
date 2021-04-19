@@ -2,8 +2,8 @@
 
 #!/usr/bin/env bash
 
-ROWS=3
-COLS=3
+ROWS="0-3"
+COLS="4-7"
 
 PARAMS=""
 POSITIONAL=()
@@ -51,12 +51,15 @@ eval set -- "$PARAMS"
 
 if [ ! -d "/input/${OUTPUT_DIR}" ]; then
     mkdir -p /input/${OUTPUT_DIR}
+else
+    rm /input/${OUTPUT_DIR}/*
 fi
 
 docker run --gpus all -it --rm --shm-size=8g \
 	-v `pwd`:/input -w /stylegan \
 	-v $HOME/github/stylegan-tools:/stylegan \
 	-e DNNLIB_CACHE_DIR=/stylegan/.cache \
-	stylegan:pytorch python /stylegan/style_mixing.py --outdir=/input/$OUTPUT_DIR \
+	stylegan:latest python /stylegan/style_mixing.py \
+    --outdir=/input/$OUTPUT_DIR \
 	--network=/stylegan/pretrained/${NET}.pkl \
 	--rows=${ROWS} --cols=${COLS}

@@ -19,6 +19,11 @@ do
             INPUT_DIR="$2"
             shift 2
             ;;
+        # Variables
+        -v|--video)
+            VIDEO_FILE="$2"
+            shift 2
+            ;;
         -o|--output)
             OUTPUT_DIR="$2"
             shift 2
@@ -43,19 +48,34 @@ eval set -- "$PARAMS"
 
 if [[ -z "$INPUT_DIR" ]]
 then
-    echo "Please choose an input directory"
+    echo "Please choose an input directory/video with \"\-i\""
     exit 1
 fi
 
-if [[ -z "$OUTPUT_DIR" ]]
-then
+if [[ -z "$OUTPUT_DIR" ]]; then
     echo "Please choose an output directory"
     exit 1
 fi
 
+if [ ! -d "$OUTPUT_DIR/" ]; then
+    mkdir -p $OUTPUT_DIR
+fi
+
 if [[ -z "$JSON" ]]
 then
-    JSON="--json=$OUTPUT_DIR/test.json"
+    JSON="--json=$OUTPUT_DIR"
+fi
+
+# If we're processing a video
+if [[ ! -z $VIDEO_FILE ]]; then
+    # Clear temporary frames folder
+    rm ./frames/*
+    # Slice video into frames and save audio
+    ffmpeg -y -hide_banner -loglevel panic \
+        -i ${VIDEO_FILE} ./frames/%05d.png \
+        -q:a 0 -map a ./clip.mp3
+    # Set align target location
+    $INPUT_DIR=./frames
 fi
 
 docker run --gpus all -it --rm --shm-size=8g \
@@ -63,7 +83,7 @@ docker run --gpus all -it --rm --shm-size=8g \
     -v $HOME/github/stylegan-tools:/stylegan \
     -w /stylegan -e DNNLIB_CACHE_DIR=/stylegan/.cache \
     --user $(id -u):$(id -g) \
-	stylegan:pytorch python3 alignFaces.py \
+	stylegan:latest python3 /stylegan/alignFaces.py \
     --predictor=/input/$PREDICTOR \
     --input=/input/$INPUT_DIR \
     --output=/input/${OUTPUT_DIR} $JSON

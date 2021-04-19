@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build -t stylegan:latest .
+docker build -t stylegan:latest -f docker/Dockerfile .

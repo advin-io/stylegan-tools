@@ -1,4 +1,4 @@
-#!/opt/conda/bin/python
+#!/usr/bin/python3
 # The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt
 #
 #   This example program shows how to find frontal human faces in an image and
@@ -29,7 +29,7 @@ from ffhqtools import recreate_aligned_images
 
 def cleanJSON(json_template):
     jsonClone = json_template
-    jsonClone["0"]["metadata"]["photo_url"]=[]
+    jsonClone["0"]["metadata"]["photo_url"]=""
     jsonClone["0"]["metadata"]["photo_title"]=""
     jsonClone["0"]["metadata"]["author"]="Nick Armenta"
     jsonClone["0"]["metadata"]["country"]="USA"
@@ -81,7 +81,7 @@ args = parser.parse_args()
 if not os.path.exists(args.output_folder_path): os.mkdir(args.output_folder_path)
 
 # Load json template and duplicate
-with open(args.json, 'r') as f:
+with open('/stylegan/template.json', 'r') as f:
     f_json = json.load(f)
     f.close()
 
@@ -92,37 +92,40 @@ detector = dlib.get_frontal_face_detector()
 faces = dlib.full_object_detections()
 predictor = dlib.shape_predictor(args.predictor_path)
 
-num=str(0)
-
 # For every image in the target directory
 if len(glob.glob(os.path.join(args.faces_folder_path, "*.*")))==0:
     print('No input files available!')
     exit()
-    
-for f in sorted(glob.glob(os.path.join(args.faces_folder_path, "*.*"))):
+
+for idx, f in enumerate(sorted(glob.glob(os.path.join(args.faces_folder_path, "*.*")))):
+    num = str(idx)
     fileName = Path(f).stem # extract filename
-    print(f"Aligning image {fileName}")
 
     # Save metadata
-    newJson[num]["in_the_wild"]["file_size"]= os.path.getsize(f)
-    newJson[num]["in_the_wild"]["file_path"] = str(Path(f))
     img = dlib.load_rgb_image(f) # load image for dlib
-    
+
     # Find bounding box of faces and upsample once
     dets = detector(img, 1)
-    if len(dets)==0: break # if no faces are found continue
+    if len(dets)==0:
+        print(f"Skipping image {f}")
+        continue # if no faces are found continue
+    
+    print(f"Aligning image {f}")
     detection = dets[0] # CHANGE THIS LINE TO LOOP FOR MULTIPLE FACES
     shape = predictor(img, detection) # get face landmarks
     # Create landmark list
     landmarks = [(part.x, part.y) for part in shape.parts()]
     newJson[num]["in_the_wild"]["face_landmarks"] = landmarks # save landmarks to json
+    newJson[num]["in_the_wild"]["file_size"]= os.path.getsize(f)
+    newJson[num]["in_the_wild"]["file_path"] = str(f)
 
     # Align to landmarks in json file
     alignedImage = recreate_aligned_images(newJson,
                         output_size=1024, transform_size=4096, enable_padding=True)
 
     # Save aligned image
-    savePath = f"{args.output_folder_path}/{fileName}.jpg"
+    savePath = "{}/{}{:05d}.png".format(args.output_folder_path, fileName, idx)
+    print(savePath)
     alignedImage.save(savePath) # save image to file
     newJson[num]["image"]["file_path"] = savePath
     newJson[num]["image"]["file_size"]= os.path.getsize(savePath)
@@ -134,6 +137,6 @@ for f in sorted(glob.glob(os.path.join(args.faces_folder_path, "*.*"))):
     # CHANGE TO USE IMAGE VARIABLE
     newJson[num]["image"]["face_landmarks"] = get_landmarks(dlib.load_rgb_image(savePath))
 
-    with open(f"{args.json}", 'w') as f:
+    with open("{}/{}{:05d}.json".format(args.output_folder_path,fileName,idx), 'w') as f:
         json.dump(newJson, f)
         f.close()

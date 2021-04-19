@@ -50,7 +50,7 @@ docker run --gpus all -it --rm --shm-size=8g \
     -v $HOME/github/stylegan-tools:/stylegan \
 	-w /stylegan -e DNNLIB_CACHE_DIR=/stylegan/.cache \
     --user $(id -u):$(id -g) \
-	stylegan:pytorch python /stylegan/generate.py \
+	stylegan:latest python /stylegan/generate.py \
 	--trunc=${TRUNC} --seeds=${SEED} \
    	--outdir=/input/${OUTPUT_DIR} \
 	--network=/stylegan/pretrained/${NET}.pkl
