@@ -57,13 +57,14 @@ if [[ -z "$OUTPUT_DIR" ]]; then
     exit 1
 fi
 
-if [ ! -d "$OUTPUT_DIR/" ]; then
-    mkdir -p $OUTPUT_DIR
+if [ -d "$OUTPUT_DIR/" ]; then
+    rm -r $OUTPUT_DIR
 fi
 
-if [[ -z "$JSON" ]]
-then
-    JSON="--json=$OUTPUT_DIR"
+mkdir -p $OUTPUT_DIR/json
+
+if [[ -z "$JSON" ]]; then
+    JSON="--json=$OUTPUT_DIR/json"
 fi
 
 # If we're processing a video

@@ -44,7 +44,7 @@ done
 eval set -- "$PARAMS"
 
 if [ ! -d "/input/${OUTPUT_DIR}" ]; then
-    mkdir -p /input/${OUTPUT_DIR}
+    mkdir -p /input/${OUTPUT_DIR}/vectors/
 fi
 
 docker run --gpus all -it --rm --shm-size=8g \
@@ -53,4 +53,4 @@ docker run --gpus all -it --rm --shm-size=8g \
 	-e DNNLIB_CACHE_DIR=/stylegan/.cache \
 	stylegan:latest python /stylegan/projector-dev.py \
 	--outdir=/input/$OUTPUT_DIR --seed=$SEED --target=$INPUT_DIR \
-    --network=/stylegan/pretrained/${NET}.pkl
+    --network=/stylegan/pretrained/$NET.pkl

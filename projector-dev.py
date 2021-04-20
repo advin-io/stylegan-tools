@@ -198,7 +198,7 @@ def run_projection(
         synth_image = (synth_image + 1) * (255/2)
         synth_image = synth_image.permute(0, 2, 3, 1).clamp(0, 255).to(torch.uint8)[0].cpu().numpy()
         PIL.Image.fromarray(synth_image, 'RGB').save('{}/{}{:05d}.png'.format(outdir, fileName, idx))
-        np.savez('{}/{}{:05d}.npz'.format(outdir, fileName, idx), w=projected_w.unsqueeze(0).cpu().numpy())
+        np.savez('{}/vectors/{}{:05d}.npz'.format(outdir, fileName, idx), w=projected_w.unsqueeze(0).cpu().numpy())
 
 #----------------------------------------------------------------------------
 
