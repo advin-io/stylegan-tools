@@ -26,4 +26,4 @@ WORKDIR /workspace
 # extension builds significantly faster as we only compile for the
 # currently active GPU configuration.
 RUN (printf '#!/bin/bash\nunset TORCH_CUDA_ARCH_LIST\nexec \"$@\"\n' >> /entry.sh) && chmod a+x /entry.sh
-ENTRYPOINT ["/entry.sh"]
+# ENTRYPOINT ["/entry.sh"]
