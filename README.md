@@ -8,9 +8,17 @@ This is my toolset for [StyleGAN2-ADA-PyTorch](https://github.com/NVlabs/stylega
 
 ### Requirements
 
-* Nvidia GPU
-* [Docker](https://docs.docker.com/engine/install/ubuntu/#install-using-the-convenience-script)
-* [Nvidia NGC account](https://ngc.nvidia.com/signin)
+* [Nvidia Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
+
+## Docker
+
+Build the image and run with
+
+```bash
+user@host:~$ cd stylegan-tools # move to repo directory
+user@host:~$ docker/docker_build.sh # call others the same way
+user@host:~$ docker/docker_run.sh # call others the same way
+```
 
 ## Utilities
 

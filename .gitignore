@@ -6,6 +6,9 @@ pretrained/*
 projections*
 aligned*
 frames/*
+datasets/*
+models/*
+training-runs/*
 *.jpg
 *.png
 *.mp4

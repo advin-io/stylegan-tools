@@ -17,6 +17,7 @@ while [[ $# -gt 0 ]]; do
         # Flags
         -h|--help)
             helpmenu
+            exit
             ;;
         # Variables
         -d|--data)
@@ -28,8 +29,8 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         -*|--*=) # unsupported flags
-            echo "Error: Unsupported flag $2" >&2
-            shift
+            helpmenu
+            exit 
             ;;
         *) # preserve positional arguments
             PARAMS="$PARAMS $1"
@@ -79,7 +80,7 @@ if [ ! -z $NET ]; then
     esac
 else
     case $DATA in
-        # Models
+        # Data
         "celeba-hq")
             URL=https://www.dropbox.com/s/f7pvjij2xlpff59/celeba_hq.zip?dl=0
             ZIP_FILE=celeba-hq.zip
